@@ -1,0 +1,24 @@
+@keyframes cqDropIn {
+  0% {
+    opacity: 0;
+    transform: scaleY(0.8);
+  }
+  100% {
+    opacity: 1;
+    transform: scaleY(1);
+  }
+}
+
+@keyframes cqDropOut {
+  0% {
+    opacity: 1;
+    transform: scaleY(1);
+  }
+  100% {
+    opacity: 0;
+    transform: scaleY(0.8);
+  }
+}
+
+// select、dropdown
+@include make-animation(cqDrop);
