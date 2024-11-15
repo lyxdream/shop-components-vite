@@ -23,7 +23,7 @@
     "*.css"
   ],
   "scripts": {
-    "prepare": "husky",
+    "prepare": "husky && npm run generate:entry:files",
     "lint": "eslint ./src ./packages",
     "lint:fix": "npm run lint --fix",
     "build": "vite build --config build/vite.config.build.taro.vue.ts && npm run build:components && npm run build:css && npm run build:resolver && npm run dts:taro && node scripts/generate-unplugin-deps.cjs",
