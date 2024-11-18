@@ -57,5 +57,4 @@ fs.outputFile(path.resolve(__dirname, '../src/taro.ts'), fileStrDev, 'utf8')
 
 dts += `  }
 }`
-// fs.outputFile(path.resolve(__dirname, '../packages/cq-shop-components-taro-demo/components.d.ts'), dts, 'utf8')
 fs.outputFile(path.resolve(__dirname, '../src/components.d.ts'), dts, 'utf8')
