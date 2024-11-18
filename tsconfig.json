@@ -18,6 +18,13 @@
     "outDir": "./tsc/type",
     "types": ["vite/client","vue"],
     "allowJs": true,
+    "preserveConstEnums": true,
+    "experimentalDecorators": true,
+    "noImplicitAny": false,
+    "allowSyntheticDefaultImports": true,
+    "noUnusedLocals": true,
+    "noUnusedParameters": true,
+    "strictNullChecks": true,
     "paths": {
       "@/*": ["src/*"],
       "@packages/*": ["packages/*"]
@@ -29,8 +36,8 @@
     "src/**/*.vue",
     "packages/**/*.ts",
     "packages/**/*.d.ts",
-    "packages/**/*.vue"
-  ],
+    "packages/**/*.vue",
+    "./examples"],
   "exclude": [
     "node_modules"
   ]

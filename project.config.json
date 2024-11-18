@@ -1,0 +1,32 @@
+{
+  "miniprogramRoot": "examplesDist/weapp/",
+  "projectname": "miniapp-examples",
+  "description": "电商组件库examples",
+  "appid": "wx6fc6ac299c8f3bec",
+  "setting": {
+    "ignoreDevUnusedFiles": false,
+    "urlCheck": true,
+    "es6": false,
+    "enhance": false,
+    "compileHotReLoad": false,
+    "postcss": false,
+    "minified": false,
+    "babelSetting": {
+      "ignore": [],
+      "disablePlugins": [],
+      "outputPath": ""
+    }
+  },
+  "compileType": "miniprogram",
+  "libVersion": "3.6.5",
+  "srcMiniprogramRoot": "examplesDist/weapp/",
+  "packOptions": {
+    "ignore": [],
+    "include": []
+  },
+  "condition": {},
+  "editorSetting": {
+    "tabIndent": "insertSpaces",
+    "tabSize": 2
+  }
+}

@@ -7,8 +7,12 @@
   },
   "include": [
     "src/taro.build.ts",
-    "src/utils",
-     "src/resolver"
+    "src/**/*.ts", 
+    "src/**/*.d.ts",
+    "src/**/*.vue",
+    "packages/**/*.ts",
+    "packages/**/*.d.ts",
+    "packages/**/*.vue"
     ],
   "exclude": ["node_modules"]
 }

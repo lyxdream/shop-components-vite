@@ -8,7 +8,7 @@ package-lock.json
 /src/taro.ts
 /src/taro.build.ts
 /tsc
-
+/examplesDist
 # local env files
 .env.local
 .env.*.local
