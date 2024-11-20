@@ -1,9 +1,6 @@
 const config = require('../src/config.json')
 const path = require('path')
-const fs = require('fs').promises
-
-const sourceDir = path.resolve(__dirname, '../tsc/type') // 拷贝的源文件夹
-const toDir = path.resolve(__dirname, '../dist/types') // 目标目录 dist/types
+const fs = require('fs-extra')
 
 const preContent = `
 declare type Install<T> = T & {
@@ -13,6 +10,8 @@ const start = 'declare const _default:'
 const end = ';\nexport default _default;\n'
 // 匹配从 start 开始到 end结束的字符串，并捕获中间的部分。
 const regex = new RegExp(`${start}([\\s\\S]*?)${end}`)
+const sourceDir = path.resolve(__dirname, '../tsc/type') // 拷贝的源文件夹
+const toDir = path.resolve(__dirname, '../dist/types') // 目标目录 dist/types
 
 // 获取文件名
 const getFileName = (filePath) => {
@@ -72,6 +71,26 @@ const getCompName = (packages, name) => {
   return ''
 }
 
+// 修改文件内容
+const modifyFileContent = (inputs, content, componentName, setup) => {
+  let remain = `
+declare module 'vue' {
+    interface GlobalComponents {
+        Cq${componentName}: typeof _default;
+    }
+}`
+  if (setup) {
+    let changeContent = content.replace(
+      'export default _default;',
+      `declare const _cq_default: WithInstall<typeof _default>;\nexport default _cq_default;\n${remain}`
+    )
+    changeContent = `import type { WithInstall } from '../../utils';\n` + changeContent
+    return changeContent
+  } else {
+    let changeContent = content.replace(regex, `${preContent}${start} Install<${inputs[1]}>${end}${remain}`)
+    return changeContent
+  }
+}
 // 处理组件声明文件的内容
 const modifyTypeDefinitions = async (distPackages) => {
   try {
@@ -82,29 +101,13 @@ const modifyTypeDefinitions = async (distPackages) => {
     for (const item of fileList) {
       const content = await fs.readFile(item, 'utf-8')
       const inputs = content.match(regex)
-
       if (inputs && inputs.length) {
         let name = getFileName(item)
         const _ComponentName = getCompName(packages, name)
         if (_ComponentName) {
           const [componentName, setup] = _ComponentName
-          let remain = `
-declare module 'vue' {
-    interface GlobalComponents {
-        Cq${componentName}: typeof _default;
-    }
-}`
-          if (setup) {
-            let changeContent = content.replace(
-              'export default _default;',
-              `declare const _cq_default: WithInstall<typeof _default>;\nexport default _cq_default;\n${remain}`
-            )
-            changeContent = `import type { WithInstall } from '../../utils';\n` + changeContent
-            await fs.writeFile(item, changeContent, 'utf-8')
-          } else {
-            let changeContent = content.replace(regex, `${preContent}${start} Install<${inputs[1]}>${end}${remain}`)
-            await fs.writeFile(item, changeContent, 'utf-8')
-          }
+          const newContent = modifyFileContent(inputs, content, componentName, setup) // 修改文件内容
+          await fs.writeFile(item, newContent, 'utf-8')
         }
       }
     }
@@ -129,7 +132,7 @@ const generateTypesDefinitions = async (sourceDir, distBase) => {
     await fs.mkdir(path.dirname(distBase), { recursive: true })
 
     // 复制 src 文件夹内容到 dist/types
-    await fs.cp(srcDir, distBase, { recursive: true })
+    await fs.copy(srcDir, distBase, { recursive: true })
     console.log(`src声明文件写入成功`)
 
     // 重命名文件
@@ -140,10 +143,11 @@ const generateTypesDefinitions = async (sourceDir, distBase) => {
     await fs.writeFile(indexNewName, pathRewriter()(content), 'utf8')
 
     // 复制 packages 文件夹内容
-    await fs.cp(packagesDir, distPackages, { recursive: true })
+    await fs.copy(packagesDir, distPackages, { recursive: true })
     console.log(`packages声明文件写入成功`)
 
-    await modifyTypeDefinitions(distPackages) // 处理组件声明文件的内容
+    // 处理组件声明文件的内容
+    await modifyTypeDefinitions(distPackages)
 
     console.log('所有类型声明文件写入成功')
   } catch (err) {
