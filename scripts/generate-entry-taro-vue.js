@@ -49,7 +49,7 @@ const processPackage = (pkg) => {
 /**
  * @description 生成所有组件的打包入口文件、类型声明文件
  */
-const generateFiles = () => {
+const generateFiles = async () => {
   try {
     let importStr = IMPORT_TEMPLATE
     let dts = DTS_TEMPLATE
@@ -72,12 +72,12 @@ const generateFiles = () => {
     const packagesName = packages.join(',')
     const buildContent = `${importStr}\n${installFunction}\nconst version = '${version}'\nexport { install, version, ${packagesName}, ${methodNames}}\nexport default { install, version}`
     const devContent = `${importStr}\n${installFunction}\n${importScssStr}\nconst version = '${version}'\nexport { install, version, ${packagesName}, ${methodNames}}\nexport default { install, version}`
-    fs.outputFile(path.resolve(__dirname, '../src/taro.build.ts'), buildContent, 'utf8')
-    fs.outputFile(path.resolve(__dirname, '../src/taro.ts'), devContent, 'utf8')
-    fs.outputFile(path.resolve(__dirname, '../src/components.d.ts'), dts + `  }\n}`, 'utf8')
+    await fs.outputFile(path.resolve(__dirname, '../src/taro.build.ts'), buildContent, 'utf8')
+    await fs.outputFile(path.resolve(__dirname, '../src/taro.dev.ts'), devContent, 'utf8')
+    await fs.outputFile(path.resolve(__dirname, '../src/components.d.ts'), dts + `  }\n}`, 'utf8')
     console.log('文件生成成功：')
     console.log('src/taro.build.ts')
-    console.log('src/taro.ts')
+    console.log('src/taro.dev.ts')
     console.log('src/components.d.ts')
   } catch (error) {
     console.error('文件生成失败:', error)
