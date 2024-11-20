@@ -87,7 +87,7 @@ const config = {
 
 ```
 
-配置完成后，可以直接在模板中使用 NutUI 组件，unplugin-vue-components 插件会自动注册对应的组件，并按需引入组件样式。
+配置完成后，可以直接在模板中使用 CqShopComponents 组件，unplugin-vue-components 插件会自动注册对应的组件，并按需引入组件样式。
 
 **直接使用**
 ```vue

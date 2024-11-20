@@ -135,7 +135,7 @@ const generateTypesDefinitions = async (sourceDir, distBase) => {
     // 重命名文件
     await fs.rename(indexOldName, indexNewName)
 
-    // 替换index文件里的路径
+    // 替换index.d.ts文件里的路径
     const content = await fs.readFile(indexNewName, 'utf-8')
     await fs.writeFile(indexNewName, pathRewriter()(content), 'utf8')
 
