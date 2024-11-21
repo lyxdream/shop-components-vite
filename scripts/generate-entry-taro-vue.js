@@ -47,7 +47,7 @@ const processPackage = (pkg) => {
 }
 
 /**
- * @description 生成所有组件的打包入口文件、类型声明文件
+ * @description 生成所有组件的打包入口文件、vue类型声明
  */
 const generateFiles = async () => {
   try {

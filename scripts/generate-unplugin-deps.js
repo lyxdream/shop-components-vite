@@ -4,41 +4,65 @@ const packageConfig = require('../package.json')
 const path = require('path')
 const fs = require('fs-extra')
 
-// 获取依赖关系
-const styleMap = new Map()
+const rootDir = path.resolve(__dirname, '..')
 const tasks = []
-let outputFileEntry = ``
-let components = []
-config.nav.forEach((item) => {
-  item.packages.forEach((element) => {
-    styleMap.set(element.name, {
-      name: element.name
-    })
-    // entry
-    if (element.exclude !== true) {
-      let outputMjs = ''
-      if (element.funcCall === true) {
-        outputMjs = `import ${element.name} from './${element.name}.js';
-import { show${element.name} } from './${element.name}.js';
-export { ${element.name}, show${element.name}, ${element.name} as default };`
-      } else {
-        outputMjs = `import ${element.name} from './${element.name}.js';
-export { ${element.name}, ${element.name} as default };`
-      }
-      let folderName = element.name.toLowerCase()
-      tasks.push(
-        fs.outputFile(path.resolve(__dirname, `../dist/packages/${folderName}/index.mjs`), outputMjs, 'utf8')
-      )
-      outputFileEntry += `export * from "./packages/${folderName}/index.mjs";\n`
-      components.push(element.name)
-    }
-  })
-})
-outputFileEntry += components
-  .map(name => `import { ${name} } from "./packages/${name.toLowerCase()}/index.mjs";`)
-  .join('\n')
-outputFileEntry += `\nexport function install(app) {
-  const packages = [${components.join(',')}];
+const components = []
+let outputFileEntry = ''
+
+// 生成基础的组件导入和导出语句
+const generateBaseComponentImportExport = (componentName, funcCall) => {
+  const importStatement = `import ${componentName} from './${componentName}.js';\n`
+  let exportStatement = `export { ${componentName}, ${componentName} as default };`
+  let funcCallImport = ''
+
+  if (funcCall) {
+    funcCallImport = `import { show${componentName} } from './${componentName}.js';\n`
+    exportStatement = `export { ${componentName}, show${componentName}, ${componentName} as default };`
+  }
+
+  return {
+    importStatement,
+    funcCallImport,
+    exportStatement
+  }
+}
+// 组件的入口文件
+const createComponentEntry = async (component) => {
+  try {
+    const { name } = component
+    const componentFolderName = name.toLowerCase()
+    const { importStatement, funcCallImport, exportStatement } = generateBaseComponentImportExport(name, component.funcCall)
+    const outputMjs = `${importStatement}${funcCallImport}${exportStatement}`
+    const outputFile = path.resolve(rootDir, `dist/packages/${componentFolderName}/index.mjs`)
+    await fs.outputFile(outputFile, outputMjs, 'utf8')
+    // outputFileEntry 总包的mjs文件引入单个组件
+    outputFileEntry += `export * from "./packages/${componentFolderName}/index.mjs";\n`
+    components.push(component.name)
+  } catch (error) {
+    console.error(`组件插件依赖入口创建失败${component.name}:`, error)
+  }
+}
+// 样式的入口
+const createStyleFiles = async (component) => {
+  try {
+    const name = component.name.toLowerCase()
+    const outputStyleMjs = `import '../../../styles/reset.css';\nimport '../index.scss';\n`
+    const outputStyleCssMjs = `import '../../../styles/reset.css';\nimport '../index.css';\n`
+    await fs.outputFile(path.resolve(rootDir, `dist/packages/${name}/style/index.mjs`), outputStyleMjs, 'utf8')
+    await fs.outputFile(path.resolve(rootDir, `dist/packages/${name}/style/css.mjs`), outputStyleCssMjs, 'utf8')
+  } catch (error) {
+    console.error(`样式插件依赖入口创建失败${component.name}:`, error)
+  }
+}
+
+// 生成总包的入口文件
+const createAllEntry = async () => {
+  try {
+    const importStatements = components.map(name => `import { ${name} } from "./packages/${name.toLowerCase()}/index.mjs";`).join('\n')
+    const componentNames = components.join(',')
+    // 生成install函数
+    outputFileEntry += `${importStatements}\nexport function install(app) {
+  const packages = [${componentNames}];
   packages.forEach((item) => {
     if (item.install) {
       app.use(item);
@@ -46,29 +70,41 @@ outputFileEntry += `\nexport function install(app) {
       app.component(item.name, item);
     }
   });
-}
-export const version = '${packageConfig.version}';
-export default {
+  }
+  export const version = '${packageConfig.version}';
+  export default {
   install,
   version
-};`
+  };`
+    const finalOutputFile = path.resolve(rootDir, 'dist/cq-shop-components.es.js')
+    await fs.outputFile(finalOutputFile, outputFileEntry, 'utf8')
+  } catch (e) {
+    console.log('总包的mjs入口文件生成失败')
+  }
+}
 
-tasks.push(
-  fs.outputFile(path.resolve(__dirname, `../dist/cq-shop-components.es.js`), outputFileEntry, 'utf8')
-)
+// 根据配置生成任务列表
+const generateTaskListFromConfig = () => {
+  config.nav.forEach((item) => {
+    item.packages.forEach((element) => {
+      if (!element.exclude) {
+        tasks.push(createComponentEntry(element))
+        tasks.push(createStyleFiles(element))
+      }
+    })
+  })
+  return tasks
+}
 
-// 处理css
-styleMap.forEach((value, key) => {
-  const name = key.toLowerCase()
-  // style
-  const outputStyleMjs = `import '../../../styles/reset.css';\nimport '../index.scss';\n`
-  const outputStyleCssMjs = `import '../../../styles/reset.css';\nimport '../index.css';\n`
-  tasks.push(
-    fs.outputFile(path.resolve(__dirname, `../dist/packages/${name}/style/index.mjs`), outputStyleMjs, 'utf8')
-  )
-  tasks.push(
-    fs.outputFile(path.resolve(__dirname, `../dist/packages/${name}/style/css.mjs`), outputStyleCssMjs, 'utf8')
-  )
-})
+// 生成/更新用于style和组件esm的 unplugin 入口文件
+const executeTasksAndCreateFinalEntry = async () => {
+  try {
+    const taskList = generateTaskListFromConfig()
+    await Promise.all(taskList)
+    await createAllEntry()
+  } catch (error) {
+    console.error(`组件入口文件创建失败:`, error)
+  }
+}
 
-Promise.all(tasks)
+executeTasksAndCreateFinalEntry()
