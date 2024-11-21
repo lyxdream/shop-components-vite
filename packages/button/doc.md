@@ -71,7 +71,7 @@ app.use(Button)
 | 参数 | 说明 | 类型 | 默认值 |
 | --- | --- | --- | --- |
 | type | 类型，可选值为 `primary` `info` `warning` `danger` `success` `default` | string | `default` |
-| form-type`4.0.7` | 表单类型，可选值 `button` `submit` `reset` | string | `button` |
+| form-type | 表单类型，可选值 `button` `submit` `reset` | string | `button` |
 | size | 尺寸，可选值为 `large` `small` `mini` `normal` | string | `normal` |
 | shape | 形状，可选值为 `square` `round` | string | `round` |
 | color | 按钮颜色，支持传入 `linear-gradient` 渐变色 | string | - |
@@ -93,7 +93,7 @@ app.use(Button)
 | --- | --- | --- |
 | click | 点击按钮时触发 | `event: MouseEvent` |
 
-### 类型定义 v4.3.0
+### 类型定义
 
 组件导出以下类型定义：
 
@@ -112,7 +112,7 @@ import type {
 
 ### 样式变量
 
-组件提供了下列 CSS 变量，可用于自定义样式，使用方法请参考 [ConfigProvider 组件](#/zh-CN/component/configprovider)。
+组件提供了下列 CSS 变量，可用于自定义样式
 
 | 名称 | 默认值 |
 | --- | --- |
