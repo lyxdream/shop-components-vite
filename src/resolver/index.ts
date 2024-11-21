@@ -19,6 +19,7 @@ export interface CqShopComponentsResolverOptions {
 const cqFunctions = ['showToast', 'showNotify', 'showDialog', 'showImagePreview']
 
 function getCqResolved(name: string, options: CqShopComponentsResolverOptions): ComponentResolveResult {
+  console.log(name, '==getCqResolved')
   const { importStyle = true, autoImport = false } = options
 
   const packageName = 'cq-shop-components'
@@ -51,7 +52,7 @@ export default function CqShopComponentsResolver(options: CqShopComponentsResolv
       const { autoImport = false } = options
 
       if (autoImport && cqFunctions.includes(name)) return getCqResolved(name, options)
-
+      console.log(name, name.slice(3), '==CqShopComponentsResolver')
       if (name.startsWith('Cq')) return getCqResolved(name.slice(3), options)
     }
   }
