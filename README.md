@@ -26,8 +26,8 @@
 ```ts
 // app.ts
 import { createApp } from 'vue'
-import CqShopComponents from "@wm/cq-shop-components";
-import "@wm/cq-shop-components/dist/style.css";
+import CqShopComponents from "cq-shop-components";
+import "cq-shop-components/dist/style.css";
 
 const App = createApp({
   onShow (options) {},
@@ -42,8 +42,8 @@ export default App
 ```ts
 // app.ts
 import { createApp } from 'vue'
-import { Button } from "@wm/cq-shop-components";
-import "@wm/cq-shop-components/dist/style.css";
+import { Button } from "cq-shop-components";
+import "cq-shop-components/dist/style.css";
 
 const App = createApp({
   onShow (options) {},
@@ -64,7 +64,7 @@ npm i unplugin-vue-components -D
 ```js
 // config/index.js
 import ComponentsPlugin from 'unplugin-vue-components/webpack'
-import CqShopComponentsResolver from '@wm/cq-shop-components/dist/resolver'
+import CqShopComponentsResolver from 'cq-shop-components/dist/resolver'
 
 const config = {
   // 小程序开发
@@ -99,7 +99,7 @@ const config = {
 **无需手动引入和注册**
 
 ```vue
-// import { Button } from '@wm/cq-shop-components';
+// import { Button } from 'cq-shop-components';
 // app.use(Button)
 ```
 
@@ -167,7 +167,7 @@ const config = {
     resource: [
       path.resolve(__dirname, '..', 'src/assets/styles/custom_theme.scss')
     ],
-    data: `@import "@wm/cq-shop-components/dist/styles/variables.scss";`
+    data: `@import "cq-shop-components/dist/styles/variables.scss";`
   },
 }
 

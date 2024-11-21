@@ -8,7 +8,7 @@
 
 ```js
 import { createApp } from 'vue'
-import { Button } from '@wm/cq-shop-components'
+import { Button } from 'cq-shop-components'
 
 const app = createApp()
 app.use(Button)
@@ -105,7 +105,7 @@ import type {
   ButtonFormType,
   ButtonProps,
   ButtonInstance
-} from '@wm/cq-shop-components';
+} from 'cq-shop-components';
 ```
 
 ## 主题定制

@@ -21,7 +21,7 @@ const cqFunctions = ['showToast', 'showNotify', 'showDialog', 'showImagePreview'
 function getCqResolved(name: string, options: CqShopComponentsResolverOptions): ComponentResolveResult {
   const { importStyle = true, autoImport = false } = options
 
-  const packageName = '@wm/cq-shop-components'
+  const packageName = 'cq-shop-components'
 
   if (!importStyle) return { name, from: packageName }
 
