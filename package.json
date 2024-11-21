@@ -46,8 +46,7 @@
     "build:resolver": "vite build --config build/vite.config.build.resolver.ts",
     "generate:types:taro": "rimraf ./tsc/type && vue-tsc --declaration --emitDeclarationOnly -p ./tsconfig.taro.json && rimraf ./dist/types && node scripts/generate-types-taro.js",
     "generate:entry:files": "node scripts/generate-entry-taro-vue.js",
-    "generate:themes:taro": "node scripts/generate-themes.js",
-    "test":"node scripts/generate-unplugin-deps.js"
+    "generate:themes:taro": "node scripts/generate-themes.js"
   },
   "devDependencies": {
     "@commitlint/cli": "^19.5.0",

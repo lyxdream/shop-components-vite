@@ -10,6 +10,12 @@ const themesEnum = {
 }
 let sassFileStr = `` // 引入的组件样式
 
+// 统一错误处理函数
+const handleError = (error, operationName) => {
+  console.error(`${operationName}失败:`, error)
+  throw error
+}
+
 // 编译SASS为css
 const compileSass = async (filePath, outputFilePath) => {
   try {
@@ -17,8 +23,7 @@ const compileSass = async (filePath, outputFilePath) => {
     await fs.unlinkSync(filePath)
     await fs.outputFile(outputFilePath, result.css, 'utf8')
   } catch (error) {
-    console.error(`SASS编译失败: ${filePath}`, error)
-    throw error
+    handleError(error, 'SASS编译')
   }
 }
 // 解析scss变量到一个对象
@@ -55,31 +60,30 @@ const copyFiles = async () => {
   try {
     let copyFilesTasks = []
     // 拷贝单个组件的index.scss
-    config.nav.map((item) => {
+    config.nav.forEach((item) => {
       item.packages.forEach((element) => {
         let folderName = element.name.toLowerCase()
         if (!element.exclude) {
           sassFileStr += `@import '../../packages/${folderName}/index.scss';\n`
         }
+        const sourcePath = path.join(rootDir, `packages/${folderName}/index.scss`)
+        const targetPath = path.join(rootDir, `dist/packages/${folderName}/index.scss`)
+
         copyFilesTasks.push(
-          fs.copy(
-            path.resolve(rootDir, `packages/${folderName}/index.scss`),
-            path.resolve(rootDir, `dist/packages/${folderName}/index.scss`)
-          )
+          fs.copy(sourcePath, targetPath)
         )
       })
     })
     // 拷贝style文件夹
+    const sourceStylePath = path.join(rootDir, 'src/styles')
+    const targetStylePath = path.join(rootDir, 'dist/styles')
     copyFilesTasks.push(
-      fs.copy(
-        path.join(rootDir, 'src/styles'),
-        path.join(rootDir, 'dist/styles')
-      )
+      fs.copy(sourceStylePath, targetStylePath)
     )
     await Promise.all(copyFilesTasks)
     console.log(`sass文件写入成功`)
   } catch (error) {
-    console.error('sass文件写入失败', error)
+    handleError(error, 'sass文件写入')
   }
 }
 
@@ -98,7 +102,7 @@ const sassTocss = async () => {
     await Promise.all(sassTocssTasks)
     console.log(`css文件写入成功`)
   } catch (error) {
-    console.error('css文件写入失败:', error)
+    handleError(error, 'css文件写入')
   }
 }
 // 异步写入文件并编译为CSS
@@ -112,7 +116,7 @@ const writeAndCompileSass = async (folderName) => {
     // 编译sass为css
     await compileSass(filePath, cssFilePath)
   } catch (error) {
-    console.error(`写入失败 ${folderName} SASS to CSS:`, error)
+    handleError(error, '写入并编译SASS为CSS')
   }
 }
 
@@ -122,15 +126,17 @@ const parseFile = async (filename, theme = 'default') => {
     const base = theme === 'default' ? 'base' : `base-${theme}`
     const filePath = path.join(rootDir, `dist/styles/${base}.scss`)
     const outputFilePath = path.join(rootDir, `dist/styles/${base}.css`)
+
     // 解析scss变量
     const data = await fs.readFile(filename, 'utf-8')
     const variables = getScssVariables(data)
     let fileContent = `@import './${themesEnum[theme]}.scss';\n:root {\n${convertScssToCssVariables(variables)}}`
     await fs.outputFile(filePath, fileContent, 'utf8')
+
     // 编译sass为css
     await compileSass(filePath, outputFilePath)
   } catch (err) {
-    console.error(`生成css变量失败: ${err}`)
+    handleError(err, '生成css变量')
   }
 }
 
@@ -147,7 +153,7 @@ const variablesResolver = async () => {
     await Promise.all(variablesResolverTasks)
     console.log('base文件写入成功')
   } catch (error) {
-    console.log('base文件写入失败' + error)
+    handleError(error, 'base文件写入')
   }
 }
 
@@ -170,7 +176,7 @@ const generateThemesFiles = async () => {
     await Promise.all(tasks)
     console.log('themes文件写入成功！')
   } catch (error) {
-    console.error('themes文件写入失败:', error)
+    handleError(error, 'themes文件写入')
   }
 }
 
@@ -181,7 +187,7 @@ async function generateStyle() {
     await variablesResolver() // 解析各个主题的scss文件，生成主题对应的css变量
     await generateThemesFiles() // 生成主题themes文件夹
   } catch (error) {
-    console.error('Error:', error)
+    handleError(error, '生成样式相关操作')
   }
 }
 generateStyle()

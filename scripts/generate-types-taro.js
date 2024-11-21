@@ -17,11 +17,11 @@ const toDir = path.resolve(__dirname, '../dist/types') // 目标目录 dist/type
 const getFileName = (filePath) => {
   // 如：C:\Users\m1780\Desktop\新建文件夹\cq-shop-components-vite\dist\types\packages\button\button.vue.d.ts
   const lastSeparatorIndex = filePath.lastIndexOf(path.sep) // 获取最后一个路径分隔符的位置
-  let name = filePath.substring(0, lastSeparatorIndex)
+  let fullPathBeforeLastSeparator = filePath.substring(0, lastSeparatorIndex)
   // C:\Users\m1780\Desktop\新建文件夹\cq-shop-components-vite\dist\types\packages\button
-  name = name.substring(name.lastIndexOf(path.sep) + 1)
+  let directoryName = fullPathBeforeLastSeparator.substring(fullPathBeforeLastSeparator.lastIndexOf(path.sep) + 1)
   // path.sep 返回当前操作系统的路径分隔符。在 Windows 上是 \，在 macOS 和 Linux 上是 /。
-  return name
+  return directoryName
 }
 
 const pathRewriter = () => {
@@ -54,13 +54,18 @@ const getCompList = async (basePath) => {
   return fileList
 }
 
+// 获取所有包信息
+const getAllPackages = () => {
+  let packages = []
+  config.nav.forEach((item) => {
+    packages = packages.concat(item.packages)
+  })
+  return packages
+}
+
 // 获取组件名  [ 'Button', true ]
-const getCompName = (packages, name) => {
-  if (!packages.length) {
-    config.nav.forEach((item) => {
-      packages = packages.concat(item.packages)
-    })
-  }
+const getCompName = (name) => {
+  const packages = getAllPackages()
   const packageName = packages.find(item => item.name.toLowerCase() === name.toLowerCase())
   if (packageName) {
     if (packageName?.setup === true) {
@@ -94,19 +99,18 @@ declare module 'vue' {
 // 处理组件声明文件的内容
 const modifyTypeDefinitions = async (distPackages) => {
   try {
-    let packages = []
     // 获取文件列表
     const fileList = await getCompList(distPackages)
     // 处理每个文件
     for (const item of fileList) {
       const content = await fs.readFile(item, 'utf-8')
-      const inputs = content.match(regex)
-      if (inputs && inputs.length) {
+      const regexMatchResult = content.match(regex)
+      if (regexMatchResult && regexMatchResult.length) {
         let name = getFileName(item)
-        const _ComponentName = getCompName(packages, name)
+        const _ComponentName = getCompName(name)
         if (_ComponentName) {
           const [componentName, setup] = _ComponentName
-          const newContent = modifyFileContent(inputs, content, componentName, setup) // 修改文件内容
+          const newContent = modifyFileContent(regexMatchResult, content, componentName, setup) // 修改文件内容
           await fs.writeFile(item, newContent, 'utf-8')
         }
       }
@@ -126,6 +130,7 @@ const generateTypesDefinitions = async (sourceDir, distBase) => {
     // 定义旧文件和新文件的路径
     const indexOldName = path.join(toDir, 'taro.build.d.ts')
     const indexNewName = path.join(toDir, 'index.d.ts')
+    const taroDevFile = path.join(toDir, 'taro.dev.d.ts')
 
     // 确保目标文件夹存在
     await fs.mkdir(path.dirname(distPackages), { recursive: true })
@@ -141,6 +146,7 @@ const generateTypesDefinitions = async (sourceDir, distBase) => {
     // 替换index.d.ts文件里的路径
     const content = await fs.readFile(indexNewName, 'utf-8')
     await fs.writeFile(indexNewName, pathRewriter()(content), 'utf8')
+    await fs.writeFile(taroDevFile, pathRewriter()(content), 'utf8')
 
     // 复制 packages 文件夹内容
     await fs.copy(packagesDir, distPackages, { recursive: true })

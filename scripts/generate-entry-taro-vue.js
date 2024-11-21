@@ -12,11 +12,11 @@ declare module 'vue' {
 
 /**
  * @description 生成一个用于安装插件的函数代码字符串
- * @param {*} packages 组件列表
+ * @param {Array} componentPackages 组件列表
  */
-const generateInstallFunction = (packages) => {
+const generateInstallFunction = (componentPackages) => {
   return `function install(app: App) {
-  const packages = [${packages.join(',')}]
+  const packages = [${componentPackages.join(',')}]
   packages.forEach((item:any) => {
     if (item.install) {
       app.use(item)
@@ -26,7 +26,6 @@ const generateInstallFunction = (packages) => {
   })
 }`
 }
-
 /**
  * @description 处理单个组件的配置，生成相应的导入语句、类型声明、SCSS 导入语句等。
  * @param {*} pkg 组件相关信息
@@ -34,10 +33,16 @@ const generateInstallFunction = (packages) => {
 const processPackage = (pkg) => {
   let { name, funcCall, exclude, setup } = pkg
   const lowerName = name.toLowerCase()
-  const importStatement = setup ? `import ${name} from '@packages/${lowerName}/index'\nexport * from '@packages/${lowerName}/index'\n` : `import ${name} from '@packages/${lowerName}/index.vue'\n`
-  const methodStatements = funcCall ? `import { show${name} } from '@packages/${lowerName}/index'\n` : ''
+  let importStatement = `import ${name} from '@packages/${lowerName}/index.vue'\n`
+  let methodStatements = ''
   const dtsStatement = `    Cq${name}: typeof import('@packages/${lowerName}/${setup ? 'index' : 'index.vue'}')['default']\n`
   const scssImport = `import '@packages/${lowerName}/index.scss'\n`
+  if (setup) {
+    importStatement = `import ${name} from '@packages/${lowerName}/index'\nexport * from '@packages/${lowerName}/index'\n`
+  }
+  if (funcCall) {
+    methodStatements = `import { show${name} } from '@packages/${lowerName}/index'\n`
+  }
   return {
     name: !exclude && name,
     importStatement: importStatement + methodStatements,
@@ -54,7 +59,7 @@ const generateFiles = async () => {
     let importStr = IMPORT_TEMPLATE
     let dts = DTS_TEMPLATE
     let importScssStr = ''
-    const packages = []
+    const componentPackages = []
     const methods = []
     config.nav.map((item) => {
       item.packages.forEach((pkg) => {
@@ -62,19 +67,22 @@ const generateFiles = async () => {
         importStr += importStatement
         importScssStr += scssImport
         dts += dtsStatement
-        if (name) packages.push(name)
+        if (name) componentPackages.push(name)
         if (pkg.funcCall) methods.push(`show${name}`)
       })
     })
-    const installFunction = generateInstallFunction(packages)
+    const installFunction = generateInstallFunction(componentPackages)
     const version = packageConfig.version
     const methodNames = methods.join(',')
-    const packagesName = packages.join(',')
+    const packagesName = componentPackages.join(',')
+
     const buildContent = `${importStr}\n${installFunction}\nconst version = '${version}'\nexport { install, version, ${packagesName}, ${methodNames}}\nexport default { install, version}`
     const devContent = `${importStr}\n${installFunction}\n${importScssStr}\nconst version = '${version}'\nexport { install, version, ${packagesName}, ${methodNames}}\nexport default { install, version}`
+
     await fs.outputFile(path.resolve(__dirname, '../src/taro.build.ts'), buildContent, 'utf8')
     await fs.outputFile(path.resolve(__dirname, '../src/taro.dev.ts'), devContent, 'utf8')
     await fs.outputFile(path.resolve(__dirname, '../src/components.d.ts'), dts + `  }\n}`, 'utf8')
+
     console.log('文件生成成功：')
     console.log('src/taro.build.ts')
     console.log('src/taro.dev.ts')
