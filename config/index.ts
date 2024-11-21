@@ -35,7 +35,7 @@ export default defineConfig(async (merge, {}) => {
     compiler: {
       type: 'webpack5',
       prebundle: {
-        exclude: ['@nutui/nutui-taro', 'vue3-shop-components'],
+        exclude: ['cq-shop-components'],
         enable: false,
         force: true
       }
