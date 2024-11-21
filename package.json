@@ -1,6 +1,6 @@
 {
   "name": "cq-shop-components",
-  "version": "1.0.1",
+  "version": "1.0.2",
   "description": "taro电商组件库（支持小程序和h5）",
   "main": "dist/cq-shop-components.umd.js",
   "module": "dist/cq-shop-components.es.js",
