@@ -59,7 +59,7 @@ export default defineConfig({
           '@tarojs/taro': 'Taro'
         },
         plugins: [],
-        exports: 'named' // 禁用命名和默认导出混合使用的警告
+        exports: 'named' // 导出命名导出
       }
     },
     lib: {

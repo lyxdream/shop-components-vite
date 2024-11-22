@@ -120,7 +120,7 @@ const writeAndCompileSass = async (folderName) => {
   }
 }
 
-// 解析scss文件，生成css变量
+// 解析scss主题文件，生成css主题文件
 const parseFile = async (filename, theme = 'default') => {
   try {
     const base = theme === 'default' ? 'base' : `base-${theme}`
@@ -140,7 +140,7 @@ const parseFile = async (filename, theme = 'default') => {
   }
 }
 
-// 循环themesEnum，生成不同的css变量
+// 循环themesEnum，生成不同主题的含css变量的文件
 const variablesResolver = async () => {
   try {
     let variablesResolverTasks = []

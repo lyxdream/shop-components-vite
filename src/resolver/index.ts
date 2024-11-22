@@ -2,7 +2,7 @@ import type { ComponentResolveResult, ComponentResolver } from 'unplugin-vue-com
 
 export interface CqShopComponentsResolverOptions {
   /**
-   * import style css or sass with components
+   * import style css 或 sass
    *
    * @default 'css'
    */

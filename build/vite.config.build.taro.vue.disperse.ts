@@ -37,7 +37,7 @@ export default defineConfig({
               || tag.startsWith('picker-view-column')
             )
           },
-          whitespace: 'preserve'
+          whitespace: 'preserve' // 保留所有空白字符
         }
       }
     })

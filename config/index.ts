@@ -3,6 +3,7 @@ import TsconfigPathsPlugin from 'tsconfig-paths-webpack-plugin'
 // import ComponentsPlugin from 'unplugin-vue-components/webpack'
 import devConfig from './dev'
 import prodConfig from './prod'
+import path from 'path'
 
 // eslint-disable-next-line no-empty-pattern
 export default defineConfig(async (merge, {}) => {
@@ -21,6 +22,9 @@ export default defineConfig(async (merge, {}) => {
     sourceRoot: 'examples',
     outputRoot: `examplesDist/${process.env.TARO_ENV}`,
     plugins: [],
+    sass: {
+      resource: [path.resolve(__dirname, '../src/styles/variables.scss')]
+    },
     defineConstants: {
     },
     copy: {
@@ -68,6 +72,17 @@ export default defineConfig(async (merge, {}) => {
       },
       webpackChain(chain) {
         chain.resolve.plugin('tsconfig-paths').use(TsconfigPathsPlugin)
+        chain.merge({
+          module: {
+            rule: [
+              {
+                test: /.(js|ts)$/,
+                exclude: /node_modules/,
+                loader: 'babel-loader'
+              }
+            ]
+          }
+        })
       }
     },
     h5: {
