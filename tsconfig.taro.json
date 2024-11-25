@@ -9,10 +9,7 @@
     "src/taro.build.ts",
     "src/**/*.ts", 
     "src/**/*.d.ts",
-    "src/**/*.vue",
-    "packages/**/*.ts",
-    "packages/**/*.d.ts",
-    "packages/**/*.vue"
+    "src/**/*.vue"
     ],
   "exclude": ["node_modules"]
 }

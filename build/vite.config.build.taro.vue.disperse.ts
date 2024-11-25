@@ -9,7 +9,7 @@ configPkg.nav.map((item) => {
   item.packages.forEach((element) => {
     const { name, setup, funcCall } = element
     const suffix = funcCall === true || setup === true ? '.ts' : '.vue'
-    input[name] = path.resolve(__dirname, `../packages/${name.toLowerCase()}/index${suffix}`)
+    input[name] = path.resolve(__dirname, `../src/packages/${name.toLowerCase()}/index${suffix}`)
   })
 })
 

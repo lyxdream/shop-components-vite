@@ -1,6 +1,6 @@
 import { App } from 'vue'
-import Button from '../packages/button/index'
-export * from '../packages/button/index'
+import Button from './packages/button/index'
+export * from './packages/button/index'
 
 function install(app: App) {
   const packages = [Button]
@@ -12,8 +12,8 @@ function install(app: App) {
     }
   })
 }
-import '../packages/button/index.scss'
+import './packages/button/index.scss'
 
-const version = '1.0.8'
+const version = '1.0.9'
 export { install, version, Button }
 export default { install, version }

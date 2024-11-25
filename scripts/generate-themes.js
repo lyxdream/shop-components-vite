@@ -66,7 +66,7 @@ const copyFiles = async () => {
         if (!element.exclude) {
           sassFileStr += `@import '../../packages/${folderName}/index.scss';\n`
         }
-        const sourcePath = path.join(rootDir, `packages/${folderName}/index.scss`)
+        const sourcePath = path.join(rootDir, `src/packages/${folderName}/index.scss`)
         const targetPath = path.join(rootDir, `dist/packages/${folderName}/index.scss`)
 
         copyFilesTasks.push(
@@ -182,7 +182,7 @@ const generateThemesFiles = async () => {
 
 async function generateStyle() {
   try {
-    await copyFiles() // 复制文件到dist目录
+    await copyFiles() // 将样式相关文件拷贝到dist目录
     await sassTocss()// 将scss文件额外转换一份css
     await variablesResolver() // 解析各个主题的scss文件，生成主题对应的css变量
     await generateThemesFiles() // 生成主题themes文件夹

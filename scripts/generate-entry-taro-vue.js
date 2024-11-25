@@ -33,15 +33,15 @@ const generateInstallFunction = (componentPackages) => {
 const processPackage = (pkg) => {
   let { name, funcCall, exclude, setup } = pkg
   const lowerName = name.toLowerCase()
-  let importStatement = `import ${name} from '@packages/${lowerName}/index.vue'\n`
+  let importStatement = `import ${name} from './packages/${lowerName}/index.vue'\n`
   let methodStatements = ''
-  const dtsStatement = `    Cq${name}: typeof import('@packages/${lowerName}/${setup ? 'index' : 'index.vue'}')['default']\n`
-  const scssImport = `import '@packages/${lowerName}/index.scss'\n`
+  const dtsStatement = `    Cq${name}: typeof import('./packages/${lowerName}/${setup ? 'index' : 'index.vue'}')['default']\n`
+  const scssImport = `import './packages/${lowerName}/index.scss'\n`
   if (setup) {
-    importStatement = `import ${name} from '@packages/${lowerName}/index'\nexport * from '@packages/${lowerName}/index'\n`
+    importStatement = `import ${name} from './packages/${lowerName}/index'\nexport * from './packages/${lowerName}/index'\n`
   }
   if (funcCall) {
-    methodStatements = `import { show${name} } from '@packages/${lowerName}/index'\n`
+    methodStatements = `import { show${name} } from './packages/${lowerName}/index'\n`
   }
   return {
     name: !exclude && name,
