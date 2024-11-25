@@ -37,7 +37,7 @@
     "lint": "eslint ./src",
     "lint:fix": "npm run lint --fix",
     "dev:demo:weapp": "taro build --type weapp --watch",
-    "dev:demo:h5": "npm run build:h5 -- --watch",
+    "dev:demo:h5": "taro build --type h5 -- --watch",
     "build:demo:weapp": "taro build --type weapp",
     "build:demo:h5": "taro build --type h5",
     "build": "vite build --config build/vite.config.build.taro.vue.ts && npm run build:components && npm run build:css && npm run build:resolver && npm run generate:types:taro && node scripts/generate-unplugin-deps.js",

@@ -89,12 +89,12 @@ export default defineConfig(async (merge, {}) => {
       publicPath: '/',
       staticDirectory: 'static',
       output: {
-        filename: 'js/[name].[hash:8].js',
+        filename: 'js/[name].[fullhash:8].js',
         chunkFilename: 'js/[name].[chunkhash:8].js'
       },
       miniCssExtractPluginOption: {
         ignoreOrder: true,
-        filename: 'css/[name].[hash].css',
+        filename: 'css/[name].[fullhash].css',
         chunkFilename: 'css/[name].[chunkhash].css'
       },
       postcss: {
@@ -112,6 +112,20 @@ export default defineConfig(async (merge, {}) => {
       },
       webpackChain(chain) {
         chain.resolve.plugin('tsconfig-paths').use(TsconfigPathsPlugin)
+        chain.merge({
+          module: {
+            rule: [
+              {
+                test: /.(js|ts)$/,
+                exclude: /node_modules/,
+                loader: 'babel-loader'
+              }
+            ]
+          }
+        })
+        chain.merge({
+          performance: { maxEntrypointSize: 10000000, maxAssetSize: 30000000 }
+        })
       }
     }
   }
