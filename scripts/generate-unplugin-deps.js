@@ -9,20 +9,25 @@ const tasks = []
 const components = []
 let outputFileEntry = ''
 
-// 生成基础的组件导入和导出语句
-const generateBaseComponentImportExport = (componentName, funcCall) => {
-  const importStatement = `import ${componentName} from './${componentName}.js';\n`
-  let exportStatement = `export { ${componentName}, ${componentName} as default };`
-  let funcCallImport = ''
-
-  if (funcCall) {
-    funcCallImport = `import { show${componentName} } from './${componentName}.js';\n`
-    exportStatement = `export { ${componentName}, show${componentName}, ${componentName} as default };`
-  }
+// 生成基础的组件导入和导出语句 componentName, funcCall
+/**
+ *@description 生成基础的组件导入和导出语句
+ * @param {*} componentName 组件名称
+ * @param {*} funcCall 是否式函数式组件
+ * @returns
+ */
+const generateBaseComponentImportExport = (componentName) => {
+  const importStatement = `import Cq${componentName} from './${componentName}.js';\n`
+  let exportStatement = `export { Cq${componentName}, Cq${componentName} as default };`
+  // let funcCallImport = ''
+  // if (funcCall) {
+  //   funcCallImport = `import { show${componentName} } from './${componentName}.js';\n`
+  //   exportStatement = `export { ${componentName}, show${componentName}, ${componentName} as default };`
+  // }
 
   return {
     importStatement,
-    funcCallImport,
+    // funcCallImport,
     exportStatement
   }
 }
@@ -31,7 +36,7 @@ const createComponentEntry = async (component) => {
   try {
     const { name } = component
     const componentFolderName = name.toLowerCase()
-    const { importStatement, funcCallImport, exportStatement } = generateBaseComponentImportExport(name, component.funcCall)
+    const { importStatement, funcCallImport = '', exportStatement } = generateBaseComponentImportExport(name, component.funcCall)
     const outputMjs = `${importStatement}${funcCallImport}${exportStatement}`
     const outputFile = path.resolve(rootDir, `dist/packages/${componentFolderName}/index.mjs`)
     await fs.outputFile(outputFile, outputMjs, 'utf8')
@@ -58,8 +63,9 @@ const createStyleFiles = async (component) => {
 // 生成总包的入口文件
 const createAllEntry = async () => {
   try {
-    const importStatements = components.map(name => `import { ${name} } from "./packages/${name.toLowerCase()}/index.mjs";`).join('\n')
-    const componentNames = components.join(',')
+    const importStatements = components.map(name => `import { Cq${name} } from "./packages/${name.toLowerCase()}/index.mjs";`).join('\n')
+    const prefixedPackages = components.map(name => `Cq${name}`)
+    const componentNames = prefixedPackages.join(',')
     // 生成install函数
     outputFileEntry += `${importStatements}\nexport function install(app) {
   const packages = [${componentNames}];

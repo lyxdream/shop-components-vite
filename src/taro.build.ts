@@ -1,9 +1,9 @@
 import { App } from 'vue'
-import Button from './packages/button/index'
+import CqButton from './packages/button/index'
 export * from './packages/button/index'
 
 function install(app: App) {
-  const packages = [Button]
+  const packages = [CqButton]
   packages.forEach((item: any) => {
     if (item.install) {
       app.use(item)
@@ -13,5 +13,5 @@ function install(app: App) {
   })
 }
 const version = '1.0.9'
-export { install, version, Button }
+export { install, version, CqButton }
 export default { install, version }

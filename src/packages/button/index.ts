@@ -1,8 +1,10 @@
 import Button from './button.vue'
 import type { ComponentPublicInstance } from 'vue'
-import { withInstall } from '../../utils'
+import { withInstall, SFCWithInstall } from '../../utils'
 
-withInstall(Button)
+// withInstall(Button)
+const CqButton: SFCWithInstall<typeof Button> = withInstall(Button)
+export { CqButton, CqButton as default }
 
 export type { ButtonProps } from './button.vue'
 
@@ -10,4 +12,4 @@ export type { ButtonType, ButtonSize, ButtonShape, ButtonFormType } from './type
 
 export type ButtonInstance = ComponentPublicInstance & InstanceType<typeof Button>
 
-export { Button, Button as default }
+// export { Button, Button as default }

@@ -31,20 +31,20 @@ const generateInstallFunction = (componentPackages) => {
  * @param {*} pkg 组件相关信息
  */
 const processPackage = (pkg) => {
-  let { name, funcCall, exclude, setup } = pkg
+  let { name, exclude, setup } = pkg
   const lowerName = name.toLowerCase()
-  let importStatement = `import ${name} from './packages/${lowerName}/index.vue'\n`
+  let importStatement = `import Cq${name} from './packages/${lowerName}/index.vue'\n`
   let methodStatements = ''
   const dtsStatement = `    Cq${name}: typeof import('./packages/${lowerName}/${setup ? 'index' : 'index.vue'}')['default']\n`
   const scssImport = `import './packages/${lowerName}/index.scss'\n`
   if (setup) {
-    importStatement = `import ${name} from './packages/${lowerName}/index'\nexport * from './packages/${lowerName}/index'\n`
+    importStatement = `import Cq${name} from './packages/${lowerName}/index'\nexport * from './packages/${lowerName}/index'\n`
   }
-  if (funcCall) {
-    methodStatements = `import { show${name} } from './packages/${lowerName}/index'\n`
-  }
+  // if (funcCall) {
+  //   methodStatements = `import { show${name} } from './packages/${lowerName}/index'\n`
+  // }
   return {
-    name: !exclude && name,
+    name: !exclude && (`Cq${name}`),
     importStatement: importStatement + methodStatements,
     dtsStatement,
     scssImport
@@ -68,7 +68,7 @@ const generateFiles = async () => {
         importScssStr += scssImport
         dts += dtsStatement
         if (name) componentPackages.push(name)
-        if (pkg.funcCall) methods.push(`show${name}`)
+        // if (pkg.funcCall) methods.push(`show${name}`)
       })
     })
     const installFunction = generateInstallFunction(componentPackages)
@@ -77,7 +77,7 @@ const generateFiles = async () => {
     const packagesName = componentPackages.join(',')
 
     const buildContent = `${importStr}\n${installFunction}\nconst version = '${version}'\nexport { install, version, ${packagesName}, ${methodNames}}\nexport default { install, version}`
-    const devContent = `${importStr}\n${installFunction}\n${importScssStr}\nconst version = '${version}'\nexport { install, version, ${packagesName}, ${methodNames}}\nexport default { install, version}`
+    const devContent = `${importStr}\n${installFunction}\n${importScssStr}\nconst version = '${version}'\nexport { install, version, ${packagesName}, ${methodNames}}\nexport default { install, version }`
 
     await fs.outputFile(path.resolve(__dirname, '../src/taro.build.ts'), buildContent, 'utf8')
     await fs.outputFile(path.resolve(__dirname, '../src/taro.dev.ts'), devContent, 'utf8')
