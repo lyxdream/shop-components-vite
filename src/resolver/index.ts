@@ -13,24 +13,24 @@ export interface CqShopComponentsResolverOptions {
    *
    * @default false
    */
-  autoImport?: boolean
+  // autoImport?: boolean
 }
 
-const cqFunctions = ['showToast', 'showNotify', 'showDialog', 'showImagePreview']
+// const cqFunctions = ['showToast', 'showNotify', 'showDialog', 'showImagePreview']
 
 function getCqResolved(name: string, options: CqShopComponentsResolverOptions): ComponentResolveResult {
-  const { importStyle = true, autoImport = false } = options
-
+  // const { importStyle = true, autoImport = false } = options
+  const { importStyle = true } = options
   const packageName = 'cq-shop-components'
 
   if (!importStyle) return { name, from: packageName }
 
-  const componentName = autoImport ? name.slice(4) : name
+  // const componentName = autoImport ? name.slice(4) : name
 
-  let style = `${packageName}/dist/packages/${componentName.toLowerCase()}/style/css`
+  let style = `${packageName}/dist/packages/${name.toLowerCase()}/style/css`
 
   if (importStyle === 'sass') {
-    style = `${packageName}/dist/packages/${componentName.toLowerCase()}/style`
+    style = `${packageName}/dist/packages/${name.toLowerCase()}/style`
   }
 
   return {
@@ -41,16 +41,15 @@ function getCqResolved(name: string, options: CqShopComponentsResolverOptions): 
 }
 
 /**
- * Resolver for CqShopComponents
+ *  CqShopComponents
  *
  */
 export default function CqShopComponentsResolver(options: CqShopComponentsResolverOptions = {}): ComponentResolver {
   return {
     type: 'component',
     resolve: (name) => {
-      const { autoImport = false } = options
-
-      if (autoImport && cqFunctions.includes(name)) return getCqResolved(name, options)
+      // const { autoImport = false } = options
+      // if (autoImport && cqFunctions.includes(name)) return getCqResolved(name, options)
       if (name.startsWith('Cq')) return getCqResolved(name.slice(2), options)
     }
   }

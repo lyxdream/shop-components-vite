@@ -6,8 +6,9 @@ const rootDir = path.resolve(__dirname, '..')
 
 // 主题枚举
 const themesEnum = {
-  cqdj: 'variables-cqdj'
+  old: 'variables-old'
 }
+
 let sassFileStr = `` // 引入的组件样式
 
 // 统一错误处理函数
@@ -53,6 +54,41 @@ const convertScssToCssVariables = (variables) => {
     }
   }
   return fileContent
+}
+
+// 异步写入文件并编译为CSS
+const writeAndCompileSass = async (folderName) => {
+  try {
+    // 写入main.scss，引入变量文件variables.scss和组件样式index.scss
+    const filePath = path.join(rootDir, `dist/packages/${folderName}/main.scss`)
+    const cssFilePath = path.join(rootDir, `dist/packages/${folderName}/index.css`)
+    const content = `@import '../../styles/variables.scss';\n@import './index.scss';\n`
+    await fs.outputFile(filePath, content, 'utf8')
+    // 编译sass为css
+    await compileSass(filePath, cssFilePath)
+  } catch (error) {
+    handleError(error, '写入并编译SASS为CSS')
+  }
+}
+
+// 解析scss主题文件，生成css主题文件
+const parseFile = async (filename, theme = 'default') => {
+  try {
+    const base = theme === 'default' ? 'base' : `base-${theme}`
+    const filePath = path.join(rootDir, `dist/styles/${base}.scss`)
+    const outputFilePath = path.join(rootDir, `dist/styles/${base}.css`)
+
+    // 解析scss变量
+    const data = await fs.readFile(filename, 'utf-8')
+    const variables = getScssVariables(data)
+    let fileContent = `@import './${themesEnum[theme]}.scss';\n:root {\n${convertScssToCssVariables(variables)}}`
+    await fs.outputFile(filePath, fileContent, 'utf8')
+
+    // 编译sass为css
+    await compileSass(filePath, outputFilePath)
+  } catch (err) {
+    handleError(err, '生成css变量')
+  }
 }
 
 // 将样式相关文件拷贝到dist目录
@@ -105,40 +141,6 @@ const sassTocss = async () => {
     handleError(error, 'css文件写入')
   }
 }
-// 异步写入文件并编译为CSS
-const writeAndCompileSass = async (folderName) => {
-  try {
-    // 写入main.scss，引入变量文件variables.scss和组件样式index.scss
-    const filePath = path.join(rootDir, `dist/packages/${folderName}/main.scss`)
-    const cssFilePath = path.join(rootDir, `dist/packages/${folderName}/index.css`)
-    const content = `@import '../../styles/variables.scss';\n@import './index.scss';\n`
-    await fs.outputFile(filePath, content, 'utf8')
-    // 编译sass为css
-    await compileSass(filePath, cssFilePath)
-  } catch (error) {
-    handleError(error, '写入并编译SASS为CSS')
-  }
-}
-
-// 解析scss主题文件，生成css主题文件
-const parseFile = async (filename, theme = 'default') => {
-  try {
-    const base = theme === 'default' ? 'base' : `base-${theme}`
-    const filePath = path.join(rootDir, `dist/styles/${base}.scss`)
-    const outputFilePath = path.join(rootDir, `dist/styles/${base}.css`)
-
-    // 解析scss变量
-    const data = await fs.readFile(filename, 'utf-8')
-    const variables = getScssVariables(data)
-    let fileContent = `@import './${themesEnum[theme]}.scss';\n:root {\n${convertScssToCssVariables(variables)}}`
-    await fs.outputFile(filePath, fileContent, 'utf8')
-
-    // 编译sass为css
-    await compileSass(filePath, outputFilePath)
-  } catch (err) {
-    handleError(err, '生成css变量')
-  }
-}
 
 // 循环themesEnum，生成不同主题的含css变量的文件
 const variablesResolver = async () => {
@@ -162,7 +164,7 @@ const generateThemesFiles = async () => {
   try {
     let themes = [
       { file: 'default.scss', sourcePath: `@import '../variables.scss';` },
-      { file: 'cqdj.scss', sourcePath: `@import '../variables-cqdj.scss';` }
+      { file: 'old.scss', sourcePath: `@import '../variables-old.scss';` }
     ]
     const tasks = themes.map(async (item) => {
       const filePath = path.join(rootDir, `dist/styles/themes/${item.file}`)

@@ -13,7 +13,6 @@ let outputFileEntry = ''
 /**
  *@description 生成基础的组件导入和导出语句
  * @param {*} componentName 组件名称
- * @param {*} funcCall 是否式函数式组件
  * @returns
  */
 const generateBaseComponentImportExport = (componentName) => {
@@ -36,8 +35,10 @@ const createComponentEntry = async (component) => {
   try {
     const { name } = component
     const componentFolderName = name.toLowerCase()
-    const { importStatement, funcCallImport = '', exportStatement } = generateBaseComponentImportExport(name, component.funcCall)
-    const outputMjs = `${importStatement}${funcCallImport}${exportStatement}`
+    // const { importStatement, funcCallImport = '', exportStatement } = generateBaseComponentImportExport(name, component.funcCall)
+    // const outputMjs = `${importStatement}${funcCallImport}${exportStatement}`
+    const { importStatement, exportStatement } = generateBaseComponentImportExport(name)
+    const outputMjs = `${importStatement}${exportStatement}`
     const outputFile = path.resolve(rootDir, `dist/packages/${componentFolderName}/index.mjs`)
     await fs.outputFile(outputFile, outputMjs, 'utf8')
     // outputFileEntry 总包的mjs文件引入单个组件

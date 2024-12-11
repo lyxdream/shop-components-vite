@@ -7,9 +7,11 @@ const input = {}
 
 configPkg.nav.map((item) => {
   item.packages.forEach((element) => {
-    const { name, setup, funcCall } = element
-    const suffix = funcCall === true || setup === true ? '.ts' : '.vue'
-    input[name] = path.resolve(__dirname, `../src/packages/${name.toLowerCase()}/index${suffix}`)
+    // const { name, setup, funcCall } = element
+    // const suffix = funcCall === true || setup === true ? '.ts' : '.vue'
+    // input[name] = path.resolve(__dirname, `../src/packages/${name.toLowerCase()}/index${suffix}`)
+    const { name } = element
+    input[name] = path.resolve(__dirname, `../src/packages/${name.toLowerCase()}/index.ts`)
   })
 })
 
@@ -23,6 +25,8 @@ export default defineConfig({
     ]
   },
   plugins: [
+    // 默认情况下，Vue会对未知标签发出警告，并且不会编译它们的内容。
+    // isCustomElement 可以指定某些标签为自定义元素，从而避免这些警告并正确处理这些标签。
     vue({
       template: {
         compilerOptions: {
@@ -41,6 +45,7 @@ export default defineConfig({
         }
       }
     })
+
   ],
   build: {
     minify: false, // Taro 相关的构建不能开启，开启后会导致找不到模板  确保生成的代码不会被压缩，避免潜在的问题。

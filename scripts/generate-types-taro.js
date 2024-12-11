@@ -2,10 +2,10 @@ const config = require('../src/config.json')
 const path = require('path')
 const fs = require('fs-extra')
 
-const preContent = `
-declare type Install<T> = T & {
-    install(app: import('vue').App): void;
-};\n`
+// const preContent = `
+// declare type Install<T> = T & {
+//     install(app: import('vue').App): void;
+// };\n`
 const start = 'declare const _default:'
 const end = ';\nexport default _default;\n'
 // 匹配从 start 开始到 end结束的字符串，并捕获中间的部分。
@@ -61,33 +61,40 @@ const getCompName = (name) => {
   const packages = getAllPackages()
   const packageName = packages.find(item => item.name.toLowerCase() === name.toLowerCase())
   if (packageName) {
-    if (packageName?.setup === true) {
-      return [packageName.name, true]
-    }
-    return [packageName.name, false]
+    return packageName.name
+    // if (packageName?.setup === true) {
+    //   return [packageName.name, true]
+    // }
+    // return [packageName.name, false]
   }
   return ''
 }
 
 // 修改文件内容
-const modifyFileContent = (inputs, content, componentName, setup) => {
+const modifyFileContent = (content, componentName) => {
   let remain = `
 declare module 'vue' {
     interface GlobalComponents {
         Cq${componentName}: typeof _default;
     }
 }`
-  if (setup) {
-    let changeContent = content.replace(
-      'export default _default;',
-      `declare const _cq_default: WithInstall<typeof _default>;\nexport default _cq_default;\n${remain}`
-    )
-    changeContent = `import type { WithInstall } from '../../utils';\n` + changeContent
-    return changeContent
-  } else {
-    let changeContent = content.replace(regex, `${preContent}${start} Install<${inputs[1]}>${end}${remain}`)
-    return changeContent
-  }
+  // if (setup) {
+  //   let changeContent = content.replace(
+  //     'export default _default;',
+  //     `declare const _cq_default: WithInstall<typeof _default>;\nexport default _cq_default;\n${remain}`
+  //   )
+  //   changeContent = `import type { WithInstall } from '../../utils';\n` + changeContent
+  //   return changeContent
+  // } else {
+  //   let changeContent = content.replace(regex, `${preContent}${start} Install<${inputs[1]}>${end}${remain}`)
+  //   return changeContent
+  // }
+  let changeContent = content.replace(
+    'export default _default;',
+    `declare const _cq_default: WithInstall<typeof _default>;\nexport default _cq_default;\n${remain}`
+  )
+  changeContent = `import type { WithInstall } from '../../utils';\n` + changeContent
+  return changeContent
 }
 // 处理组件声明文件的内容
 const modifyTypeDefinitions = async (distPackages) => {
@@ -100,10 +107,10 @@ const modifyTypeDefinitions = async (distPackages) => {
       const regexMatchResult = content.match(regex)
       if (regexMatchResult && regexMatchResult.length) {
         let name = getFileName(item)
-        const _ComponentName = getCompName(name)
-        if (_ComponentName) {
-          const [componentName, setup] = _ComponentName
-          const newContent = modifyFileContent(regexMatchResult, content, componentName, setup) // 修改文件内容
+        const componentName = getCompName(name)
+        if (componentName) {
+          // const [componentName] = _ComponentName
+          const newContent = modifyFileContent(content, componentName) // 修改文件内容
           await fs.writeFile(item, newContent, 'utf-8')
         }
       }

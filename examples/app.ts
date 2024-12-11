@@ -3,9 +3,9 @@ import './app.scss'
 
 import '../dist/style.css'
 // import CqShopComponents from '@/taro.dev'
-// import { CqButton } from '@/taro.dev'
+import { CqButton } from '@/taro.dev'
 // import CqShopComponents from '../dist/cq-shop-components.es.js'
-import { CqButton } from '../dist/packages/button/index.mjs'
+// import { CqButton } from '../dist/packages/button/index.mjs'
 const App = createApp({
   onShow() {
     console.log('App onShow.')

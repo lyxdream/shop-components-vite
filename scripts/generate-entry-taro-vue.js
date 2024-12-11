@@ -31,15 +31,17 @@ const generateInstallFunction = (componentPackages) => {
  * @param {*} pkg 组件相关信息
  */
 const processPackage = (pkg) => {
-  let { name, exclude, setup } = pkg
+  let { name, exclude } = pkg
   const lowerName = name.toLowerCase()
-  let importStatement = `import Cq${name} from './packages/${lowerName}/index.vue'\n`
+  // let importStatement = `import Cq${name} from './packages/${lowerName}/index.vue'\n`
+  let importStatement = `import Cq${name} from './packages/${lowerName}/index'\nexport * from './packages/${lowerName}/index'\n`
   let methodStatements = ''
-  const dtsStatement = `    Cq${name}: typeof import('./packages/${lowerName}/${setup ? 'index' : 'index.vue'}')['default']\n`
+  // const dtsStatement = `    Cq${name}: typeof import('./packages/${lowerName}/${setup ? 'index' : 'index.vue'}')['default']\n`
+  const dtsStatement = `    Cq${name}: typeof import('./packages/${lowerName}/index')['default']\n`
   const scssImport = `import './packages/${lowerName}/index.scss'\n`
-  if (setup) {
-    importStatement = `import Cq${name} from './packages/${lowerName}/index'\nexport * from './packages/${lowerName}/index'\n`
-  }
+  // if (setup) {
+  //   importStatement = `import Cq${name} from './packages/${lowerName}/index'\nexport * from './packages/${lowerName}/index'\n`
+  // }
   // if (funcCall) {
   //   methodStatements = `import { show${name} } from './packages/${lowerName}/index'\n`
   // }

@@ -1,23 +1,18 @@
 {
   "nav": [
     {
-      "name": "基础组件",
-      "enName": "basic",
+      "name": "basic",
+      "cName": "基础组件",
       "packages": [
         {
-          "version": "1.0.1",
           "name": "Button",
-          "cName": "按钮",
-          "setup": true,
-          "funcCall":false,
-          "desc": "按钮用于触发一个操作，如提交表单。",
-          "author": "yinxia"
+          "cName": "按钮"
         }
       ]
     },
     {
-      "name": "业务组件",
-      "enName": "business",
+      "name": "business",
+      "cName": "业务组件",
       "packages": [
       ]
     }
