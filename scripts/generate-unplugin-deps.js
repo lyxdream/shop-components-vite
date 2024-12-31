@@ -18,15 +18,9 @@ let outputFileEntry = ''
 const generateBaseComponentImportExport = (componentName) => {
   const importStatement = `import Cq${componentName} from './${componentName}.js';\n`
   let exportStatement = `export { Cq${componentName}, Cq${componentName} as default };`
-  // let funcCallImport = ''
-  // if (funcCall) {
-  //   funcCallImport = `import { show${componentName} } from './${componentName}.js';\n`
-  //   exportStatement = `export { ${componentName}, show${componentName}, ${componentName} as default };`
-  // }
 
   return {
     importStatement,
-    // funcCallImport,
     exportStatement
   }
 }
@@ -35,8 +29,6 @@ const createComponentEntry = async (component) => {
   try {
     const { name } = component
     const componentFolderName = name.toLowerCase()
-    // const { importStatement, funcCallImport = '', exportStatement } = generateBaseComponentImportExport(name, component.funcCall)
-    // const outputMjs = `${importStatement}${funcCallImport}${exportStatement}`
     const { importStatement, exportStatement } = generateBaseComponentImportExport(name)
     const outputMjs = `${importStatement}${exportStatement}`
     const outputFile = path.resolve(rootDir, `dist/packages/${componentFolderName}/index.mjs`)
