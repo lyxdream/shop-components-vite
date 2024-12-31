@@ -7,7 +7,6 @@
     @click="handleClick"
   >
     <view class="cq-button__wrap">
-      <!-- <Loading v-if="loading" class="cq-icon-loading" /> -->
       <slot v-if="$slots.icon && !loading" name="icon"></slot>
       <view v-if="$slots.default" :class="{ 'cq-button__text': $slots.icon || loading }">
         <slot></slot>
@@ -18,7 +17,6 @@
 
 <script setup lang="ts">
 import { type CSSProperties, computed } from 'vue'
-// import { Loading } from ''
 import Taro from '@tarojs/taro'
 import type { ButtonShape, ButtonType, ButtonSize, ButtonFormType } from './types'
 
